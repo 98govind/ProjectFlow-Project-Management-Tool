@@ -3,6 +3,10 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, date, timedelta
+from zoneinfo import ZoneInfo
+
+def india_time():
+    return datetime.now(ZoneInfo("Asia/Kolkata")).replace(tzinfo=None)
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "projectflow_secret_key"
@@ -27,7 +31,7 @@ class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(150), nullable=False)
     description = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.now)
+    created_at = db.Column(db.DateTime, default=india_time)
     owner_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
 
@@ -46,7 +50,7 @@ class Task(db.Model):
 class TaskComment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     comment_text = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.now)
+    created_at = db.Column(db.DateTime, default=india_time)
     task_id = db.Column(db.Integer, db.ForeignKey("task.id"), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
@@ -54,7 +58,7 @@ class TaskComment(db.Model):
 class ActivityLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     action = db.Column(db.String(255), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.now)
+    created_at = db.Column(db.DateTime, default=india_time)
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
