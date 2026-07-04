@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ project.title }} | ProjectFlow</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <h2>ProjectFlow</h2>
+        <a href="/dashboard">Dashboard</a>
+    </nav>
+
+    <div class="container">
+        <h1>{{ project.title }}</h1>
+        <p class="subtitle">{{ project.description }}</p>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>{{ todo_count }}</h3>
+                <p>To Do</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>{{ progress_count }}</h3>
+                <p>In Progress</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>{{ done_count }}</h3>
+                <p>Done</p>
+            </div>
+
+            <div class="stat-card danger-card">
+                <h3>{{ overdue_count }}</h3>
+                <p>Overdue</p>
+            </div>
+
+            <div class="stat-card warning-card">
+                <h3>{{ due_soon_count }}</h3>
+                <p>Due Soon</p>
+            </div>
+        </div>
+
+        <div class="progress-box">
+            <div class="progress-header">
+                <h2>Project Progress</h2>
+                <span>{{ project_progress }}%</span>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {{ project_progress }}%;"></div>
+            </div>
+        </div>
+
+        <div class="create-box">
+            <h2>Add New Task</h2>
+
+            <form method="POST">
+                <input type="text" name="title" placeholder="Task Title" required>
+                <textarea name="description" placeholder="Task Description"></textarea>
+                <input type="text" name="assigned_to" placeholder="Assigned To">
+                <input type="date" name="due_date">
+
+                <select name="priority">
+                    <option value="Low">Low Priority</option>
+                    <option value="Medium" selected>Medium Priority</option>
+                    <option value="High">High Priority</option>
+                </select>
+
+                <textarea name="comment" placeholder="Task Notes"></textarea>
+                <button type="submit">Add Task</button>
+            </form>
+        </div>
+
+        <div class="activity-box">
+            <h2>Recent Activity</h2>
+
+            {% for activity in activities %}
+            <div class="activity-item">
+                <p>{{ activity.action }}</p>
+                <small>{{ activity.created_at.strftime('%d %b %Y %I:%M %p') }}</small>
+            </div>
+            {% else %}
+            <p>No activity yet.</p>
+            {% endfor %}
+        </div>
+
+        <h2 class="section-title">Tasks</h2>
+
+        {% for task in tasks %}
+        <div class="task-card">
+            <h3>{{ task.title }}</h3>
+            <p>{{ task.description }}</p>
+
+            <p><strong>Status:</strong> {{ task.status }}</p>
+            <p><strong>Assigned:</strong> {{ task.assigned_to }}</p>
+            <p><strong>Priority:</strong> {{ task.priority }}</p>
+            <p><strong>Due Date:</strong> {{ task.due_date }}</p>
+
+            <div class="card-actions">
+                <a href="/update_task/{{ task.id }}/To Do">To Do</a>
+                <a href="/update_task/{{ task.id }}/In Progress">In Progress</a>
+                <a href="/update_task/{{ task.id }}/Done">Done</a>
+                <a href="/edit_task/{{ task.id }}">Edit</a>
+                <a class="delete" href="/delete_task/{{ task.id }}">Delete</a>
+            </div>
+
+            <div class="comment-box">
+                <h4>Comments</h4>
+
+                {% for comment in task_comments[task.id] %}
+                <div class="comment-item">
+                    <p>{{ comment.comment_text }}</p>
+                    <small>{{ comment.created_at.strftime('%d %b %Y %I:%M %p') }}</small>
+                </div>
+                {% else %}
+                <p>No comments yet.</p>
+                {% endfor %}
+
+                <form action="/add_comment/{{ task.id }}" method="POST">
+                    <textarea name="comment_text" placeholder="Add comment..." required></textarea>
+                    <button type="submit">Add Comment</button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <p>No tasks yet.</p>
+        {% endfor %}
+    </div>
+</body>
+</html>
